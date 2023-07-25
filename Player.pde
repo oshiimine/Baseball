@@ -16,7 +16,7 @@ public class PlayerGenerator {
   String fname;
   String lname;
   
-  void GeneratePlayer(String team, SQLConnection myConnection) {
+  void GeneratePlayer(String team, SQLConnection myConnection, String position) {
     GenerateName();
     GenerateStats();
     
@@ -24,7 +24,8 @@ public class PlayerGenerator {
     for (float f : stats) {
       query += ", " + f;
     }
-    query += ", \'" + team + "\');";
+    query += ", \'" + team + "\', \'" + position + "\');";
+    System.out.println(query);
     Player.playerId++;
     
     myConnection.updateQuery(query);

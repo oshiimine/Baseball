@@ -75,6 +75,7 @@ void drawMenu() {
   text("START", 480, 378);
   text ("+", 755, 475);
   text ("-", 760, 515);
+  text("Generate Players", 120, 160);
 }
 
 
@@ -86,7 +87,7 @@ void checkMenuMouse() {
   }
   else if (mouseX > 800 && mouseX < 920 && mouseY > 20 && mouseY < 70) {
       gamestate = Gamestate.MenuTeams;
-  }
+  }  
   
   //Start Button
   else if (mouseX > 460 && mouseX < 620 && mouseY > 300 && mouseY < 420) {
@@ -106,7 +107,15 @@ void checkMenuMouse() {
   
   //temp
   else if (mouseX > 140 && mouseX < 200 && mouseY > 150 && mouseY < 180) {
-      pg.GeneratePlayer("Otters", myConnection);
+      for (int i = 0; i < 9; i++) {
+        pg.GeneratePlayer("Otters", myConnection,"Lineup");
+      }
+      for (int i = 0; i < 5; i++) {
+        pg.GeneratePlayer("Otters", myConnection,"Pitcher");
+      }
+      for (int i = 0; i < 5; i++) {
+        pg.GeneratePlayer("Otters", myConnection,"Bench");
+      }
   }
   //Add Delay Time
   else if (mouseX > 140 && mouseX < 200 && mouseY > 190 && mouseY < 220) {
