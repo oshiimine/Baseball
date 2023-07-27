@@ -1,6 +1,6 @@
-import samuelal.squelized.*; //<>//
+import samuelal.squelized.*; //<>// //<>//
 
-final int numGames = 12; //<>//
+final int numGames = 12; //<>// //<>//
 boolean allGamesDone;
 Game[] gameArray = new Game[numGames];
 String[] gameText = new String[numGames];
@@ -12,6 +12,7 @@ PlayerGenerator pg = new PlayerGenerator();
 
 Table teams, teamNameTable;
 SQLConnection myConnection = new SQLiteConnection("jdbc:sqlite:C:/Users/oshii/Documents/Processing/Projects/Baseball/basedball.db");
+SQLGame test;
 
 void setup() {
   teams = myConnection.getTable("Teams");
@@ -19,9 +20,8 @@ void setup() {
   //Just for now
   teamNameTable = myConnection.getColumns("Teams", new String[] {"location", "name"});
   size(1080, 720);
-  for (int i = 0; i < numGames; i++) {
-    gameArray[i] = new Game();
-  }
+  
+  test = new SQLGame("Otters", "Dragons", myConnection);  //<>// //<>//
 }
 
 void draw() {
@@ -107,7 +107,8 @@ void checkMenuMouse() {
   
   //temp
   else if (mouseX > 140 && mouseX < 200 && mouseY > 150 && mouseY < 180) {
-      for (int i = 0; i < 9; i++) {
+    test.throwPitch();  
+    /*for (int i = 0; i < 9; i++) {
         pg.GeneratePlayer("Otters", myConnection,"Lineup");
       }
       for (int i = 0; i < 5; i++) {
@@ -115,7 +116,7 @@ void checkMenuMouse() {
       }
       for (int i = 0; i < 5; i++) {
         pg.GeneratePlayer("Otters", myConnection,"Bench");
-      }
+      }*/
   }
   //Add Delay Time
   else if (mouseX > 140 && mouseX < 200 && mouseY > 190 && mouseY < 220) {
