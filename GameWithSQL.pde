@@ -12,6 +12,7 @@ class SQLGame {
   int team1LineupCount, team2LineupCount;
   int team1PitcherCount, team2PitcherCount;
   TableRow curBatter, curPitcher;
+  Table battingTeam, fieldingTeam;
 
 
   public SQLGame(String team1, String team2, SQLConnection myConnection) {
@@ -46,6 +47,7 @@ class SQLGame {
     
     curBatter = team1Batters.getRow(0);
     curPitcher = team2CurPitcher;
+    fieldingTeam = team2Batters;
     
     System.out.println(curBatter.getFloat("harmoniousness"));
   }
@@ -54,12 +56,10 @@ class SQLGame {
   public void throwPitch() {
     //Generate a pitch along a logistic curve
     double curPitch = randomGaussian()*0.15+0.1*curPitcher.getFloat("precision");
-    System.out.println("Pitch: " + curPitch);
     if (1/(1+Math.exp(-curBatter.getFloat("stoicism")+curPitcher.getFloat("whimsicality"))) < random(1)) {
       //Incorrect Read
       if (curPitch > 0.5) {
         curStrikes++;
-        System.out.println("Strike");
       }
       else {
         swing(curPitch);
@@ -67,7 +67,6 @@ class SQLGame {
     }
     else if (curPitch < 0.5) {
       curBalls++;
-      System.out.println("Ball");
     }
     else {
       swing(curPitch);
@@ -78,14 +77,31 @@ class SQLGame {
     
     //Closer to 0.5 easier to hit
     double hitValue = 2*Math.abs(0.5-pitch);
-    double swingValue = 1/(1+Math.exp(-0.1*curBatter.getFloat("harmoniousness")+0.67*hitValue+0.033*curPitcher.getFloat("gutturalism"))) - random(1);
-    if (swingValue < 0) {
-      System.out.println("Swing and miss: " + swingValue);
+    double swingValue = 0.8/(1+Math.exp(-0.1*curBatter.getFloat("harmoniousness")+0.67*hitValue+0.033*curPitcher.getFloat("gutturalism"))) + 0.2 - random(1);
+    if (swingValue < -0.1) {
+    }
+    else if (swingValue < 0.1) {
     }
     else {
-      System.out.println("Swing and hit: " + swingValue);
       curStrikes = 0;
       curBalls = 0;
+      TableRow randomFielder = fieldingTeam.getRow((int) random(9));
+      double contactValue = swingValue*10 + (curBatter.getFloat("spiciness") * randomGaussian() * 2 + 1);
+      double fieldingValue = contactValue - randomFielder.getFloat("fluffiness") - randomFielder.getFloat("tastiness");
+      
+      System.out.println(fieldingValue);
+      if (contactValue > 15) {
+        System.out.println("Home Run! ");
+      }
+      if (fieldingValue < -2.5) {
+        System.out.println("Ground out");
+      } else if (fieldingValue < 0) {
+        System.out.println("Fly out");
+      } else if (fieldingValue < 5) {
+        System.out.println("Single");
+      } else {
+        System.out.println("Extra Bases");
+      }
     }
   }
 }
