@@ -24,7 +24,7 @@ void setup() {
   teamNameTable = myConnection.getColumns("Teams", new String[] {"location", "name"});
   size(1080, 720);
   
-  test = new SQLGame("Otters", "Dragons", myConnection);  //<>//
+  test = new SQLGame("Otters", "Dragons", myConnection); 
 }
 
 void draw() {
@@ -47,7 +47,7 @@ void draw() {
       String teamName = teamNameTable.getString(i, 0) + " " + teamNameTable.getString(i, 1);
        text(teamName, 260, 85 + 50 * i);
     }
-    drawSingleGame();
+    drawOngoingGames();
   }
 }
 
@@ -148,7 +148,7 @@ void checkTeamsMouse() {
   }
 }
 
-void drawSingleGame() {
+void drawOngoingGames() {
   background(0);
   fill(255);
   pitchCount++;
@@ -163,7 +163,7 @@ void drawSingleGame() {
       }
     }
   } else {
-    gamestate = Gamestate.MenuMain;
+    gamestate = Gamestate.MenuMain; //<>//
   }
   DrawFrame();
 }
@@ -213,8 +213,9 @@ void DrawFrame() {
     text("Strikes: " + gameArray[i].getStrikes(), 260 + hOffset, 100 + vOffset);
     text("Outs: " + gameArray[i].getOuts(), 260 + hOffset, 115 + vOffset);
     
+    String temp = gameText[i];
     //Pitch text
-    text(gameArray[i].getPitchText(), 350 + hOffset, 85 + vOffset);
+    text(temp, 350 + hOffset, 85 + vOffset);
     
     //Pitch Count
     if (gameLengthCount[i] != 0)  text(gameLengthCount[i], 475 + hOffset, 155 + vOffset);
@@ -225,6 +226,11 @@ void DrawFrame() {
   for (int i = 0; i < numGames; i++) {
     allGamesDone &= gameArray[i].isFinished();
   }
-
+  if (allGamesDone) {
+    for (int i = 0; i < numGames; i++) {
+     System.out.println(gameArray[i].isFinished());
+    }
+    System.out.println("Done"); //<>//
+  }
   delay(delayTime);
 }

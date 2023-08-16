@@ -56,7 +56,7 @@ class SQLGame {
   }
   
   String nextMessage() {
-    String str = "";
+    String str = "You should not see this";
      //Check if inning is over
     if (curOuts == requiredOuts) {
       changeSides();
@@ -65,6 +65,7 @@ class SQLGame {
     //Check if we need a new player
     else if (curStrikes == requiredStrikes) {
       nextPlayer();
+      curOuts++;
       str = "Strike out!";
     }
     else if (curBalls == requiredBalls) {
@@ -110,8 +111,12 @@ class SQLGame {
     double hitValue = 2*Math.abs(0.5-pitch);
     double swingValue = 0.8/(1+Math.exp(-0.1*curBatter.getFloat("harmoniousness")+0.67*hitValue+0.033*curPitcher.getFloat("gutturalism"))) + 0.2 - random(1);
     if (swingValue < -0.1) {
+      pitchText = "Swing and miss!";
+      curStrikes++;
     }
     else if (swingValue < 0.1) {
+      pitchText = "Foul Ball!";
+      if (curStrikes < 2) curStrikes++;
     }
     else {
       TableRow randomFielder = fieldingTeam.getRow((int) random(9));
@@ -222,6 +227,8 @@ class SQLGame {
         baseRunners[1] = true;
         baseRunnerStats[1] = baseRunnerStats[0];
       }
+      baseRunners[0] = true;
+      baseRunnerStats[0] = curBatter;
     }
     
     //Extra bases
@@ -267,7 +274,7 @@ class SQLGame {
     curOuts = 0;
     
     if (inning >= requiredInnings - 2 && inning % 2 == 0 && score[1] > score[0] || inning > requiredInnings - 2 && inning % 2 == 1 && score[1] != score[0]) {
-      finished = true; //<>//
+      finished = true;
     }
     else {
       inning++;
