@@ -7,6 +7,8 @@ class SQLGame {
   int curBalls, curStrikes, curOuts;
   TableRow[] baseRunnerStats = new TableRow[3];
   boolean[] baseRunners = new boolean[3];
+  boolean finished;
+  String[] teamNames = new String[2];
 
   Table team1Batters, team2Batters;
   Table team1Pitchers, team2Pitchers;
@@ -33,6 +35,8 @@ class SQLGame {
     curOuts = 0;
 
     finished = false;
+    teamNames[0] = team1;
+    teamNames[1] = team2;
 
     team1Batters = myConnection.runQuery( "Select * From Players Where teamName = \'" + team1 + "\' and position = \'Lineup\';");
     team2Batters = myConnection.runQuery( "Select * From Players Where teamName = \'" + team2 + "\' and position = \'Lineup\';");
@@ -56,36 +60,36 @@ class SQLGame {
   }
   
   String nextMessage() {
-    String str = "You should not see this";
+    pitchText = "You should not see this";
      //Check if inning is over
     if (curOuts == requiredOuts) {
       changeSides();
-      str = "Change Sides!";
+      pitchText = "Change Sides!";
     }
     //Check if we need a new player
     else if (curStrikes == requiredStrikes) {
       nextPlayer();
       curOuts++;
-      str = "Strike out!";
+      pitchText = "Strike out!";
     }
     else if (curBalls == requiredBalls) {
-      advanceRunners(8411);
+      score[inning % 2] += advanceRunners(8411);
       nextPlayer();
-      str = "Walk";
+      pitchText = "Walk";
     }
     
     else {
       throwPitch();
-      str = pitchText;
     }
     
-    return str;
+    if (finished) pitchText = "Game Over!";
+    return pitchText;
   }
   
   //Throws one pitch
   public void throwPitch() {
     //Generate a pitch along a logistic curve
-    double curPitch = randomGaussian()*0.15+0.1*curPitcher.getFloat("precision");
+    double curPitch = randomGaussian()*0.3+0.1*curPitcher.getFloat("precision");
     if (1/(1+Math.exp(-curBatter.getFloat("stoicism")+curPitcher.getFloat("whimsicality"))) < random(1)) {
       //Incorrect Read
       if (curPitch > 0.5) {
@@ -338,5 +342,11 @@ class SQLGame {
   }
   public boolean isFinished() {
     return finished;
+  }
+  public String getAwayName() {
+    return teamNames[0];
+  }
+  public String getHomeName() {
+    return teamNames[1];
   }
 }

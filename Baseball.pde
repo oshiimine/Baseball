@@ -13,12 +13,13 @@ PlayerGenerator pg = new PlayerGenerator();
 Table teams, teamNameTable;
 SQLConnection myConnection = new SQLiteConnection("jdbc:sqlite:C:/Users/oshii/Documents/Processing/Projects/Baseball/basedball.db");
 SQLGame test;
+String[] teamArray = {"Dragons", "Pandas", "Warriors", "Gamblers", "Automatons", "Metro", "Penguins", 
+                    "Lobsters", "Koalas", "Kangaroos", "Kiwis", "Briskets", "Wizards", "Detectives", "Pizza",
+                    "Pasta", "Grapes", "Baguettes", "Axes", "Rockets", "Chefs", "Judges", "Dogs", "Otters"};
 
 void setup() {
   teams = myConnection.getTable("Teams");
-  for (int i = 0; i < numGames; i++) {
-    gameArray[i] = new SQLGame("Otters", "Dragons", myConnection);
-  }
+  generateGames(); //<>//
   
   //Just for now
   teamNameTable = myConnection.getColumns("Teams", new String[] {"location", "name"});
@@ -110,20 +111,23 @@ void checkMenuMouse() {
   
   //temp
   else if (mouseX > 140 && mouseX < 200 && mouseY > 150 && mouseY < 180) {
-    test.throwPitch();  
-    /*for (int i = 0; i < 9; i++) {
-        pg.GeneratePlayer("Otters", myConnection,"Lineup");
+    pg.deleteAllPlayers(myConnection);
+    for (String s : teamArray) {
+      for (int i = 0; i < 9; i++) {
+        pg.GeneratePlayer(s, myConnection,"Lineup");
       }
       for (int i = 0; i < 5; i++) {
-        pg.GeneratePlayer("Otters", myConnection,"Pitcher");
+        pg.GeneratePlayer(s, myConnection,"Pitcher");
       }
       for (int i = 0; i < 5; i++) {
-        pg.GeneratePlayer("Otters", myConnection,"Bench");
-      }*/
+        pg.GeneratePlayer(s, myConnection,"Bench");
+      }
+    }
+    generateGames();
   }
-  //Add Delay Time
+    
   else if (mouseX > 140 && mouseX < 200 && mouseY > 190 && mouseY < 220) {
-      pg.deleteAllPlayers(myConnection);
+    System.out.println("Button not in use");
   }
 }
 
@@ -163,7 +167,9 @@ void drawOngoingGames() {
       }
     }
   } else {
-    gamestate = Gamestate.MenuMain; //<>//
+    if (mousePressed == true) {
+      gamestate = Gamestate.MenuMain;
+    } //<>//
   }
   DrawFrame();
 }
@@ -186,9 +192,9 @@ void DrawFrame() {
     noStroke();
     fill(255);
 
-    textSize(20);
-    text("Away: " + gameScore[0], 60 + hOffset, 110 + vOffset);
-    text("Home: " + gameScore[1], 60 + hOffset, 140 + vOffset);
+    textSize(15);
+    text(gameArray[i].getAwayName() + ": " + gameScore[0], 60 + hOffset, 110 + vOffset);
+    text(gameArray[i].getHomeName() + ": " + gameScore[1], 60 + hOffset, 140 + vOffset);
 
     textSize(12);
     text(inningString, 60 + hOffset, 85 + vOffset);
@@ -226,11 +232,11 @@ void DrawFrame() {
   for (int i = 0; i < numGames; i++) {
     allGamesDone &= gameArray[i].isFinished();
   }
-  if (allGamesDone) {
-    for (int i = 0; i < numGames; i++) {
-     System.out.println(gameArray[i].isFinished());
-    }
-    System.out.println("Done"); //<>//
-  }
   delay(delayTime);
+}
+
+void generateGames() {
+  for (int i = 0; i < numGames; i++) {
+    gameArray[i] = new SQLGame(teamArray[2*i],teamArray[2*i+1], myConnection);
+  }
 }

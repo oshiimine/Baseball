@@ -12,7 +12,7 @@ public static class Player {
 }
 
 public class PlayerGenerator {
-  float[] stats = new float[10];
+  float[] stats = new float[11];
   String fname;
   String lname;
   
