@@ -1,8 +1,8 @@
-import samuelal.squelized.*; //<>// //<>//
+import samuelal.squelized.*;
 
-final int numGames = 12; //<>// //<>//
+final int numGames = 12; 
 boolean allGamesDone;
-Game[] gameArray = new Game[numGames];
+SQLGame[] gameArray = new SQLGame[numGames];
 String[] gameText = new String[numGames];
 int pitchCount;
 int[] gameLengthCount = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -16,12 +16,15 @@ SQLGame test;
 
 void setup() {
   teams = myConnection.getTable("Teams");
+  for (int i = 0; i < numGames; i++) {
+    gameArray[i] = new SQLGame("Otters", "Dragons", myConnection);
+  }
   
   //Just for now
   teamNameTable = myConnection.getColumns("Teams", new String[] {"location", "name"});
   size(1080, 720);
   
-  test = new SQLGame("Otters", "Dragons", myConnection);  //<>// //<>//
+  test = new SQLGame("Otters", "Dragons", myConnection);  //<>//
 }
 
 void draw() {

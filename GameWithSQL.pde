@@ -5,6 +5,8 @@ class SQLGame {
   int inning, requiredInnings, requiredBalls;
   int requiredStrikes, requiredOuts;
   int curBalls, curStrikes, curOuts;
+  TableRow[] baseRunnerStats = new TableRow[3];
+  boolean[] baseRunners = new boolean[3];
 
   Table team1Batters, team2Batters;
   Table team1Pitchers, team2Pitchers;
@@ -13,6 +15,8 @@ class SQLGame {
   int team1PitcherCount, team2PitcherCount;
   TableRow curBatter, curPitcher;
   Table battingTeam, fieldingTeam;
+  
+  String pitchText = "";
 
 
   public SQLGame(String team1, String team2, SQLConnection myConnection) {
@@ -29,7 +33,6 @@ class SQLGame {
     curOuts = 0;
 
     finished = false;
-    System.out.println("Top of the 1st!");
 
     team1Batters = myConnection.runQuery( "Select * From Players Where teamName = \'" + team1 + "\' and position = \'Lineup\';");
     team2Batters = myConnection.runQuery( "Select * From Players Where teamName = \'" + team2 + "\' and position = \'Lineup\';");
@@ -47,9 +50,35 @@ class SQLGame {
     
     curBatter = team1Batters.getRow(0);
     curPitcher = team2CurPitcher;
+    battingTeam = team1Batters;
     fieldingTeam = team2Batters;
     
-    System.out.println(curBatter.getFloat("harmoniousness"));
+  }
+  
+  String nextMessage() {
+    String str = "";
+     //Check if inning is over
+    if (curOuts == requiredOuts) {
+      changeSides();
+      str = "Change Sides!";
+    }
+    //Check if we need a new player
+    else if (curStrikes == requiredStrikes) {
+      nextPlayer();
+      str = "Strike out!";
+    }
+    else if (curBalls == requiredBalls) {
+      advanceRunners(8411);
+      nextPlayer();
+      str = "Walk";
+    }
+    
+    else {
+      throwPitch();
+      str = pitchText;
+    }
+    
+    return str;
   }
   
   //Throws one pitch
@@ -60,6 +89,7 @@ class SQLGame {
       //Incorrect Read
       if (curPitch > 0.5) {
         curStrikes++;
+        pitchText = "Strike";
       }
       else {
         swing(curPitch);
@@ -67,6 +97,7 @@ class SQLGame {
     }
     else if (curPitch < 0.5) {
       curBalls++;
+      pitchText = "Ball";
     }
     else {
       swing(curPitch);
@@ -83,25 +114,222 @@ class SQLGame {
     else if (swingValue < 0.1) {
     }
     else {
-      curStrikes = 0;
-      curBalls = 0;
       TableRow randomFielder = fieldingTeam.getRow((int) random(9));
       double contactValue = swingValue*10 + (curBatter.getFloat("spiciness") * randomGaussian() * 2 + 1);
-      double fieldingValue = contactValue - randomFielder.getFloat("fluffiness") - randomFielder.getFloat("tastiness");
+      double fieldingValue = contactValue - 2*randomFielder.getFloat("fluffiness") - randomFielder.getFloat("tastiness");
       
-      System.out.println(fieldingValue);
       if (contactValue > 15) {
-        System.out.println("Home Run! ");
+        pitchText = curBatter.getString("fName") + " " + curBatter.getString("lName") + " hits a home run!";
+        score[inning % 2] += advanceRunners(999);
       }
-      if (fieldingValue < -2.5) {
-        System.out.println("Ground out");
-      } else if (fieldingValue < 0) {
-        System.out.println("Fly out");
-      } else if (fieldingValue < 5) {
-        System.out.println("Single");
-      } else {
-        System.out.println("Extra Bases");
+      else {
+          if (fieldingValue < -2.5) {
+          pitchText = "Ground out!";
+          curOuts++;
+        } else {
+            if (fieldingValue < 0) {
+            pitchText = "Fly out!";
+            curOuts++;
+          } else if (fieldingValue < 5) {
+            pitchText = curBatter.getString("fName") + " " + curBatter.getString("lName") + " hits a single";
+          }       
+          score[inning % 2] += advanceRunners(fieldingValue);
+        }
+      }
+      nextPlayer();
+    }
+  }
+  
+  int advanceRunners(double fieldingValue) {
+    int numRuns = 0;
+    //Flyout
+    if (fieldingValue < 0 && curOuts < 3) {
+      if (baseRunners[2]) {
+        if (fieldingValue + 1 + baseRunnerStats[2].getFloat("zigzagedness")/10 > 0) {
+          baseRunners[2] = false;
+          numRuns++;
+        }
+      }
+      if (baseRunners[1] && !baseRunners[2]) {
+        if (fieldingValue + 1 + baseRunnerStats[1].getFloat("zigzagedness")/10 > 0) {
+          baseRunners[1] = false;
+          baseRunners[2] = true;
+          baseRunnerStats[2] = baseRunnerStats[1]; 
+        }
+      }
+      if (baseRunners[0] && !baseRunners[1]) {
+        if (fieldingValue + 1 + baseRunnerStats[0].getFloat("zigzagedness")/10 > 0) {
+          baseRunners[0] = false;
+          baseRunners[1] = true;
+          baseRunnerStats[1] = baseRunnerStats[0]; 
+        }
       }
     }
+    
+    //Single
+    else if (fieldingValue < 5) {
+      if (baseRunners[2]) {
+        baseRunners[2] = false;
+        numRuns++;
+      }
+      if (baseRunners[1]) {
+        if (fieldingValue + baseRunnerStats[1].getFloat("zigzagedness")/4 > 5) {
+          baseRunners[1] = false;
+          numRuns++;
+        }
+        else {
+          baseRunners[1] = false;
+          baseRunners[2] = true;
+          baseRunnerStats[2] = baseRunnerStats[1]; 
+        }
+      }
+      if (baseRunners[0]) {
+        if (!baseRunners[2] && fieldingValue + baseRunnerStats[0].getFloat("zigzagedness")/4 > 5) {
+          baseRunners[2] = true;
+          baseRunnerStats[2] = baseRunnerStats[0]; 
+        }
+        else {
+          baseRunners[1] = true;
+          baseRunnerStats[1] = baseRunnerStats[0]; 
+        }
+      }
+      
+      baseRunners[0] = true;
+      baseRunnerStats[0] = curBatter;
+    } 
+    
+    //Home Run
+    else if (fieldingValue == 999){
+      for (int i = 0; i <= 2; i++) {
+        if (baseRunners[i]) {
+          baseRunners[i] = false;
+          numRuns++;
+        }
+      }
+      numRuns++;
+    }
+    
+    //walk
+    else if (fieldingValue == 8411) {
+      if (baseRunners[0]) {
+        if (baseRunners[1]) {
+          if (baseRunners[2]) {
+            numRuns++;
+          }
+          baseRunners[2] = true;
+          baseRunnerStats[2] = baseRunnerStats[1];
+        }
+        baseRunners[1] = true;
+        baseRunnerStats[1] = baseRunnerStats[0];
+      }
+    }
+    
+    //Extra bases
+    else {
+      if (baseRunners[2]) {
+        baseRunners[2] = false;
+        numRuns++;
+      }
+      if (baseRunners[1]) {
+        baseRunners[1] = false;
+        numRuns++;
+      }
+      if (baseRunners[0]) {
+        if (fieldingValue + baseRunnerStats[0].getFloat("zigzagedness")/4 > 8) {
+          baseRunners[0] = false;
+          baseRunners[2] = true;
+          baseRunnerStats[2] = baseRunnerStats[0]; 
+        }
+        else {
+          baseRunners[0] = false;
+          baseRunners[1] = true;
+          baseRunnerStats[1] = baseRunnerStats[0]; 
+        }
+      }
+      
+      if (!baseRunners[2] && fieldingValue + curBatter.getFloat("zigzagedness")/4 > 10) {
+        baseRunners[2] = true;
+        baseRunnerStats[2] = curBatter; 
+        pitchText = "Triple!";
+      }
+      else {
+        baseRunners[1] = true;
+        baseRunnerStats[1] = curBatter; 
+        pitchText = "Double!";
+      }
+    }
+    return numRuns;
+  }
+  
+  void changeSides() {
+    for (int i = 0; i < 3; i++) baseRunners[i] = false;
+    nextPlayer();
+    curOuts = 0;
+    
+    if (inning >= requiredInnings - 2 && inning % 2 == 0 && score[1] > score[0] || inning > requiredInnings - 2 && inning % 2 == 1 && score[1] != score[0]) {
+      finished = true; //<>//
+    }
+    else {
+      inning++;
+      System.out.println("Change sides! ");
+      
+      if (inning % 2 == 0) {
+        System.out.print("Top ");
+        battingTeam = team1Batters;
+        fieldingTeam = team2Batters;
+        curBatter = battingTeam.getRow(team1LineupCount);
+        curPitcher = team2CurPitcher;
+      } else {
+        System.out.print("Bottom ");
+        battingTeam = team2Batters;
+        fieldingTeam = team1Batters;
+        curBatter = battingTeam.getRow(team2LineupCount);
+        curPitcher = team1CurPitcher;
+      }
+      System.out.println(" of the " + (inning/2 + 1));
+    }
+      System.out.println("Score: " + score[0] + " - " + score[1]);
+      
+  }
+  
+  void nextPlayer() {
+    curBalls = 0;
+    curStrikes = 0;
+    if (inning % 2 == 0) {
+      team1LineupCount = (team1LineupCount + 1) % 9;
+      curBatter = battingTeam.getRow(team1LineupCount);
+    } else {
+      team2LineupCount = (team2LineupCount + 1) % 9;
+      curBatter = battingTeam.getRow(team2LineupCount);
+    }
+  }
+  
+  public void printScore() {
+    System.out.println("Score: " + score[0] + " - " + score[1]);
+  }
+  
+  public int[] getScore() {
+    return score;
+  }
+  public boolean[] getBaseRunners() {
+    return baseRunners;
+  }
+  public String getPitchText() {
+    return pitchText;
+  }
+  public int getBalls() {
+    return curBalls;
+  }
+  public int getStrikes() {
+    return curStrikes;
+  }
+  public int getOuts() {
+    return curOuts;
+  }
+  public int getInning() {
+    return inning;
+  }
+  public boolean isFinished() {
+    return finished;
   }
 }
