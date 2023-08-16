@@ -9,10 +9,10 @@ int[] gameLengthCount = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 Gamestate gamestate = Gamestate.MenuMain;
 int delayTime = 1000;
 PlayerGenerator pg = new PlayerGenerator();
+int curDisplayedTeam = -1;
 
-Table teams, teamNameTable;
+Table teams;
 SQLConnection myConnection = new SQLiteConnection("jdbc:sqlite:C:/Users/oshii/Documents/Processing/Projects/Baseball/basedball.db");
-SQLGame test;
 String[] teamArray = {"Dragons", "Pandas", "Warriors", "Gamblers", "Automatons", "Metro", "Penguins", 
                     "Lobsters", "Koalas", "Kangaroos", "Kiwis", "Briskets", "Wizards", "Detectives", "Pizza",
                     "Pasta", "Grapes", "Baguettes", "Axes", "Rockets", "Chefs", "Judges", "Dogs", "Otters"};
@@ -21,34 +21,36 @@ void setup() {
   teams = myConnection.getTable("Teams");
   generateGames(); //<>//
   
-  //Just for now
-  teamNameTable = myConnection.getColumns("Teams", new String[] {"location", "name"});
   size(1080, 720);
-  
-  test = new SQLGame("Otters", "Dragons", myConnection); 
 }
 
 void draw() {
   background(0);
-  if (gamestate == Gamestate.MenuMain) {
-    drawMenu();
-    if (mousePressed == true) {
-      checkMenuMouse();
-    }
-  }
-  else if (gamestate == Gamestate.MenuTeams) {
-    drawTeams();
-    if (mousePressed == true) {
-      checkTeamsMouse();
-    }
-  }
-  else if (gamestate == Gamestate.Playing) {
-    fill(255);
-    for (int i = 0; i < teamNameTable.getRowCount(); i++) {
-      String teamName = teamNameTable.getString(i, 0) + " " + teamNameTable.getString(i, 1);
-       text(teamName, 260, 85 + 50 * i);
-    }
-    drawOngoingGames();
+  switch (gamestate) {
+    case MenuMain:
+      drawMenu();
+      if (mousePressed == true) {
+        checkMenuMouse();
+      }
+      break;
+    case MenuTeams:
+      drawTeams();
+      if (mousePressed == true) {
+        checkTeamsMouse();
+      }
+      break;
+    case MenuTeamInfo:
+      drawTeamInfo(teamArray[curDisplayedTeam]);
+      if (mousePressed == true) {
+        checkTeamInfoMouse();
+      }
+      break;
+    case Playing:
+      fill(255);
+      drawOngoingGames();
+      break;
+    default:
+      System.out.println("Error, invalid gamestate"); 
   }
 }
 
@@ -86,23 +88,23 @@ void drawMenu() {
 
 void checkMenuMouse() {
   //Top Menu
-  if (mouseX > 150 && mouseX < 250 && mouseY > 20 && mouseY < 70) {
+  if (mouseBetween(150, 250, 20, 70)) {
       gamestate = Gamestate.MenuMain;
   }
-  else if (mouseX > 800 && mouseX < 920 && mouseY > 20 && mouseY < 70) {
+  else if (mouseBetween(800, 920, 20, 70)) {
       gamestate = Gamestate.MenuTeams;
   }  
   
   //Start Button
-  else if (mouseX > 460 && mouseX < 620 && mouseY > 300 && mouseY < 420) {
+  else if (mouseBetween(460, 620, 300, 420)) {
       gamestate = Gamestate.Playing;
   }
   //Add Delay Time
-  else if (mouseX > 740 && mouseX < 800 && mouseY > 450 && mouseY < 480) {
+  else if (mouseBetween(740, 800, 450, 480)) {
       delayTime += 50;
   }
   //Add Delay Time
-  else if (mouseX > 740 && mouseX < 800 && mouseY > 490 && mouseY < 520) {
+  else if (mouseBetween(740, 800, 490, 520)) {
       delayTime -= 50;
       if (delayTime < 0) {
         delayTime = 0;
@@ -110,7 +112,7 @@ void checkMenuMouse() {
   }
   
   //temp
-  else if (mouseX > 140 && mouseX < 200 && mouseY > 150 && mouseY < 180) {
+  else if (mouseBetween(140, 200, 150, 180)) {
     pg.deleteAllPlayers(myConnection);
     for (String s : teamArray) {
       for (int i = 0; i < 9; i++) {
@@ -126,29 +128,8 @@ void checkMenuMouse() {
     generateGames();
   }
     
-  else if (mouseX > 140 && mouseX < 200 && mouseY > 190 && mouseY < 220) {
+  else if (mouseBetween(140, 200, 190, 220)) {
     System.out.println("Button not in use");
-  }
-}
-
-void drawTeams() {
-  background(0);
-  fill(255);
-  //Top menu buttons
-  text("Menu", 150, 50);
-  text("Teams", 800, 50);
-  
-  rect(150, 20, 100, 50);
-
-}
-
-void checkTeamsMouse() {
-  //Top Menu
-  if (mouseX > 150 && mouseX < 250 && mouseY > 20 && mouseY < 70) {
-      gamestate = Gamestate.MenuMain;
-  }
-  else if (mouseX > 800 && mouseX < 920 && mouseY > 20 && mouseY < 70) {
-      gamestate = Gamestate.MenuTeams;
   }
 }
 
@@ -239,4 +220,8 @@ void generateGames() {
   for (int i = 0; i < numGames; i++) {
     gameArray[i] = new SQLGame(teamArray[2*i],teamArray[2*i+1], myConnection);
   }
+}
+
+boolean mouseBetween(int minX, int maxX, int minY, int maxY) {
+  return mouseX > minX && mouseX < maxX && mouseY > minY && mouseY < maxY;
 }

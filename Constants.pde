@@ -1,6 +1,7 @@
 enum Gamestate {
   MenuMain,
   MenuTeams,
+  MenuTeamInfo,
   Playing
 }
 
