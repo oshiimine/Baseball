@@ -90,6 +90,12 @@ class SQLGame {
   public void throwPitch() {
     //Generate a pitch along a logistic curve
     double curPitch = randomGaussian()*0.3+0.1*curPitcher.getFloat("precision");
+    
+    //Improve low end pitchers
+    if (curPitcher.getFloat("precision") < 3) {
+      curPitch += (3-curPitcher.getFloat("precision"))/10;
+    }
+    
     if (1/(1+Math.exp(-curBatter.getFloat("stoicism")+curPitcher.getFloat("whimsicality"))) < random(1)) {
       //Incorrect Read
       if (curPitch > 0.4) {

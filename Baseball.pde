@@ -150,6 +150,7 @@ void drawOngoingGames() {
   } else {
     if (mousePressed == true) {
       gamestate = Gamestate.MenuMain;
+      generateGames();
     } //<>//
   }
   DrawFrame();
