@@ -12,7 +12,7 @@ PlayerGenerator pg = new PlayerGenerator();
 int curDisplayedTeam = -1;
 
 Table teams;
-SQLConnection myConnection = new SQLiteConnection("jdbc:sqlite:C:/Users/oshii/Documents/Processing/Projects/Baseball/basedball.db");
+SQLConnection myConnection = new SQLiteConnection("jdbc:sqlite:Projects/Baseball/basedball.db");
 String[] teamArray = {"Dragons", "Pandas", "Warriors", "Gamblers", "Automatons", "Metro", "Penguins", 
                     "Lobsters", "Koalas", "Kangaroos", "Kiwis", "Briskets", "Wizards", "Detectives", "Pizza",
                     "Pasta", "Grapes", "Baguettes", "Axes", "Rockets", "Chefs", "Judges", "Dogs", "Otters"};
@@ -199,6 +199,9 @@ void DrawFrame() {
     text("Balls: " + gameArray[i].getBalls(), 260 + hOffset, 85 + vOffset);
     text("Strikes: " + gameArray[i].getStrikes(), 260 + hOffset, 100 + vOffset);
     text("Outs: " + gameArray[i].getOuts(), 260 + hOffset, 115 + vOffset);
+    
+    text("Pitcher: " + gameArray[i].getPitcherName(), 165 + hOffset, 135 + vOffset);
+    text("Batter: " + gameArray[i].getBatterName(), 165 + hOffset, 150 + vOffset);
     
     String temp = gameText[i];
     //Pitch text

@@ -92,7 +92,7 @@ class SQLGame {
     double curPitch = randomGaussian()*0.3+0.1*curPitcher.getFloat("precision");
     if (1/(1+Math.exp(-curBatter.getFloat("stoicism")+curPitcher.getFloat("whimsicality"))) < random(1)) {
       //Incorrect Read
-      if (curPitch > 0.5) {
+      if (curPitch > 0.4) {
         curStrikes++;
         pitchText = "Strike";
       }
@@ -100,7 +100,7 @@ class SQLGame {
         swing(curPitch);
       }
     }
-    else if (curPitch < 0.5) {
+    else if (curPitch < 0.4) {
       curBalls++;
       pitchText = "Ball";
     }
@@ -348,5 +348,17 @@ class SQLGame {
   }
   public String getHomeName() {
     return teamNames[1];
+  }
+  public String getPitcherName() {
+    return curPitcher.getString("fName") + " " + curPitcher.getString("lName");
+  }
+  public String getBatterName() {
+    return curBatter.getString("fName") + " " + curBatter.getString("lName");
+  }
+  public int getBatterCount() {
+    if (inning % 2 == 0) {
+      return team1LineupCount;
+    }
+    return team2LineupCount;
   }
 }

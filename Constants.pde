@@ -9,31 +9,27 @@ enum PlayerFName {
   //Normal
   Arthur,
   Barry,
-  Brock,
-  John,
-  Helga,
-  Liz,
-  Laura,
-  Moses,
   Betty,
-  Tiffany,
-  Lucy,
-  Terra,
-  Tabitha,
+  Brock,
+  Bobo,
+  Freddy,
+  Helga,
   Javier,
   James,
+  Jesse,
+  Jessie,
+  John,
   Kiki,
   Kit,
+  Laura,
+  Liz,
+  Lucy,
+  Moses,
   Scarlet,
-  
-  //Close
-  Jarl,
-  
-  //Objects
-  Pencil,
-  Video,
-  Pop,
-  Towel,
+  Tiffany,
+  Terra,
+  Tabitha,
+  Zach,
   
   //Animals
   Fish,
@@ -43,56 +39,95 @@ enum PlayerFName {
   Wolf,
   Turtle,
   
+  //Close
+  Bosh,
+  Lad,
+  Jarl,
+  
+  //Food
+  Waffles,
+  
+  //Objects
+  Abacus,
+  Pencil,
+  Video,
+  Pop,
+  Towel,
+  
   //Random
-  Napoleon,
   Art,
-  Florida,
-  Treason,
-  Fae,
-  Hoopla,
+  Aurora,
   Chamber,
+  Fae,
+  Florida,
+  Hoopla,
+  Napoleon,
   Ope,
-  Stealth
+  Plastic,
+  Sparks,
+  Stealth,
+  Treason
   
 }
 
 enum PlayerLName {
   //Normal
-  Mason,
-  Smith,
-  Lopez,
+  Bates,
+  Chamberlain,
   Davis,
-  Ramsey,
+  Elliot,
+  Gomez,
   Jenson,
+  Lopez,
+  Mason,
+  Ramsey,
+  Smith,
   Soto,
   
   //Verbs/Professions
-  Tosser,
-  Fisher,
   Carpenter,
+  Fisher,
+  Tosser,
   
   //Animals
-  Snake,
-  Pelican,
-  Mongoose,
-  Jaguar,
   Fox,
+  Gecko,
+  Jaguar,
+  Mongoose,
+  Pelican,
+  Snake,
   
   //Objects
-  Muscles,
-  Turntable,
+  Bandana,
+  Beans,
+  Bones,
+  Bong,
   Coffee,
-  Tonic,
-  Potion,
-  Machine,
   Garbage,
+  Lamp,
+  Machine,
+  Muscles,
+  Potion,
   Satellite,
+  Tonic,
+  Turntable,
   
+  //Food
+  Alfredo,
+  Applesauce,
+  Banana,
+  Mustard,
+  Waffles,
   
-  //Instruments
+  //Musical
+  Beats,
+  Bell,
+  Drumstick,
+  Keys,
+  Marimba,
   Trombone,
   Violin,
-  Drumstick,
+  Xylophone,
   
   //Trees
   Alder,
@@ -105,13 +140,18 @@ enum PlayerLName {
   
   //Random
   Balderdash,
-  Summer,
-  Winter,
-  Spring,
   Fall,
-  Tobasco,
-  Volts,
+  Fiasco,
+  Genesis,
   Hoopla,
+  Rest,
+  Spring,
+  Storm,
+  Summer,
+  Synergy,
+  Tobasco,
   Tsunami,
-  Synergy
+  Volts,
+  Wind,
+  Winter
 }
