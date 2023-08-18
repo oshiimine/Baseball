@@ -9,6 +9,7 @@ class SQLGame {
   boolean[] baseRunners = new boolean[3];
   boolean finished;
   String[] teamNames = new String[2];
+  GameEventHandler gameEvents;
 
   Table team1Batters, team2Batters;
   Table team1Pitchers, team2Pitchers;
@@ -58,6 +59,7 @@ class SQLGame {
     battingTeam = team1Batters;
     fieldingTeam = team2Batters;
     
+    gameEvents = new GameEventHandler(team1Batters, team1Pitchers, team2Batters, team2Pitchers);
   }
   
   String nextMessage() {
@@ -82,28 +84,8 @@ class SQLGame {
     else {
       //random events
       if (random(100) < 0.05) {
-        float randomEvent = random(100);
-        //Upgrade random stat
-        if (randomEvent < 55) {
-          playerUpgradeEvent(true);
-        }
-        //Downgrade random stat
-        randomEvent -= 55;
-        if (randomEvent < 44) {
-          playerUpgradeEvent(false);
-        }
-        //Teams swap random players
-        randomEvent -= 44;
-        if (randomEvent < 0.3) {
-        }
-        //Player swaps roles 
-        randomEvent -= 0.3;
-        if (randomEvent < 0.5) {
-        }
-        //Player quits 
-        else {
-          
-        }
+        pitchText = gameEvents.randomEvent();
+        endOfGameText = pitchText += "\n";
       } else {
         throwPitch();
       }
@@ -346,66 +328,6 @@ class SQLGame {
       team2LineupCount = (team2LineupCount + 1) % 9;
       curBatter = battingTeam.getRow(team2LineupCount);
     }
-  }
-  
-  void playerUpgradeEvent(boolean upgrade) {
-    //team 1
-    String stat = "temp";
-    float upgradeAmount = random(1)/5;
-    
-    if (!upgrade) {
-      upgradeAmount *= -1;
-    }
-    
-    int randomStat = (int) random(11);
-    String[] statArray = {"stoicism", "spiciness", "harmoniousness", "gutturalism", "whimsicality", "protectiveness", "tastiness", "fluffiness",
-                          "flamboyance", "zigzagedness"};
-    
-    stat = statArray[randomStat];
-    
-    if (random(2) < 1) {
-      int eligiblePlayers = team1Batters.getRowCount() + team1Pitchers.getRowCount();
-      float randomPlayer = random(eligiblePlayers);
-      if (randomPlayer < team1Batters.getRowCount()) {
-        updatePlayer(team1Batters.getRow((int) randomPlayer), stat, team1Batters.getRow((int) randomPlayer).getFloat(stat) + upgradeAmount);
-        playerStatPitchText(team1Batters, (int) randomPlayer, stat, upgradeAmount);
-      }
-      else {
-        randomPlayer -= team1Batters.getRowCount();
-        updatePlayer(team1Pitchers.getRow((int) randomPlayer), stat, team1Pitchers.getRow((int) randomPlayer).getFloat(stat) + upgradeAmount);
-        playerStatPitchText(team1Pitchers, (int) randomPlayer, stat, upgradeAmount);
-      }
-      
-    } 
-    //team 2
-    else {
-      int eligiblePlayers = team2Batters.getRowCount() + team2Pitchers.getRowCount();
-      float randomPlayer = random(eligiblePlayers);
-      if (randomPlayer < team2Batters.getRowCount()) {
-        updatePlayer(team2Batters.getRow((int) randomPlayer), stat, team2Batters.getRow((int) randomPlayer).getFloat(stat) + upgradeAmount);
-        playerStatPitchText(team2Batters, (int) randomPlayer, stat, upgradeAmount);
-      }
-      else {
-        randomPlayer -= team2Batters.getRowCount();
-        updatePlayer(team2Pitchers.getRow((int) randomPlayer), stat, team2Pitchers.getRow((int) randomPlayer).getFloat(stat) + upgradeAmount);
-        playerStatPitchText(team2Pitchers, (int) randomPlayer, stat, upgradeAmount);
-      }
-    }
-    
-    
-  }
-  
-  void playerStatPitchText(Table players, int index, String stat, float delta) {
-    String upgradeText = " upgraded by ";
-    if (delta < 0) {
-      upgradeText = " downgraded by ";
-      delta *= -1;
-    }
-    
-    pitchText = players.getRow(index).getString("fName") + " " + players.getRow(index).getString("lName") +
-                    " had their " + stat + "\n" + upgradeText + nf(delta, 1, 2) + "!";
-    
-    endOfGameText += pitchText + "\n";
   }
   
   public void printScore() {

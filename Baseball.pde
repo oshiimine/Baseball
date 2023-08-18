@@ -19,7 +19,7 @@ String[] teamArray = {"Dragons", "Pandas", "Warriors", "Gamblers", "Automatons",
 
 void setup() {
   teams = myConnection.getTable("Teams");
-  generateGames(); //<>//
+  generateGames(); //<>// //<>//
   
   size(1080, 720);
 }
@@ -153,7 +153,7 @@ void drawOngoingGames() {
       generateGames();
       pitchCount = 0;
       gameLengthCount = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    } //<>//
+    } //<>// //<>//
   }
   DrawFrame();
 }
