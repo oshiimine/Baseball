@@ -151,6 +151,8 @@ void drawOngoingGames() {
     if (mousePressed == true) {
       gamestate = Gamestate.MenuMain;
       generateGames();
+      pitchCount = 0;
+      gameLengthCount = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     } //<>//
   }
   DrawFrame();

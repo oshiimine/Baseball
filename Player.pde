@@ -47,4 +47,10 @@ public class PlayerGenerator {
     String query = "DELETE FROM Players;";
     myConnection.updateQuery(query);
   }
+  
+}
+
+void updatePlayer(TableRow player, String stat, float value) {
+  String query = "Update Players SET" + stat + "=" + value + " WHERE playerID = " + player.getInt("playerID");
+  myConnection.updateQuery(query);
 }
